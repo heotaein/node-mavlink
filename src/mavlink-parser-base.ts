@@ -57,8 +57,6 @@ export abstract class MAVLinkParserBase {
                     this.state = ParserState.WaitingForMessageComplete;
                     this.expected_packet_length = this.calculate_packet_length(
                         this.buffer.slice(0, this.minimum_packet_length));
-
-                    console.log("exp: ", this.expected_packet_length);
     
                     if (this.expected_packet_length < 0 || this.expected_packet_length < this.minimum_packet_length) {
                         // something was wrong. drop the magic byte and restart.

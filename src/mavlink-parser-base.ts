@@ -40,19 +40,16 @@ export abstract class MAVLinkParserBase {
     public parse(bytes: Buffer): MAVLinkMessage[] {
         const messages: MAVLinkMessage[] = [];
 
-        let current_pos = 0;
+        this.buffer = Buffer.concat([this.buffer, bytes]);
 
-        do { // allow parsing multiple messages from a single call
+        while (this.state == ParserState.WaitingForMagicByte && this.buffer.indexOf(this.start_marker) > -1) { // allow parsing multiple messages from a single call
             if (this.state == ParserState.WaitingForMagicByte) {
                 // look for the defined magic byte
-                let message_start = bytes.indexOf(this.start_marker, current_pos);
+                let message_start = this.buffer.indexOf(this.start_marker);
                 if (message_start > -1) {
-                    this.buffer = bytes.slice(message_start);
+                    this.buffer = this.buffer.slice(message_start);
                     this.state = ParserState.WaitingForHeaderComplete;
                 }
-                current_pos = message_start;
-            } else {
-                this.buffer = Buffer.concat([this.buffer, bytes]);
             }
     
             if (this.state == ParserState.WaitingForHeaderComplete) {
@@ -60,6 +57,8 @@ export abstract class MAVLinkParserBase {
                     this.state = ParserState.WaitingForMessageComplete;
                     this.expected_packet_length = this.calculate_packet_length(
                         this.buffer.slice(0, this.minimum_packet_length));
+
+                    console.log("exp: ", this.expected_packet_length);
     
                     if (this.expected_packet_length < 0 || this.expected_packet_length < this.minimum_packet_length) {
                         // something was wrong. drop the magic byte and restart.
@@ -76,26 +75,23 @@ export abstract class MAVLinkParserBase {
                         const message = this.parseMessage(this.buffer.slice(0, this.expected_packet_length));
                         if (message) {
                             messages.push(message);
-                            current_pos += this.expected_packet_length
+                            this.buffer = this.buffer.slice(this.expected_packet_length);
                         }
                     } catch (e) {
+                        //this.buffer = this.buffer.slice(1);
                         throw e;
                     } finally {
                         // something was complete. Regardless of a complete message, drop the magic byte and restart.
                         this.expected_packet_length = -1;
                         this.state = ParserState.WaitingForMagicByte;
-                        this.buffer = this.buffer.slice(1);
-
-                        // drop the first magic byte in bytes to allow escaping the loop
-                        let message_start = bytes.indexOf(this.start_marker);
-                        if (message_start > -1) {
-                            bytes = bytes.slice(message_start + 1);
-                        }
                     }
-    
                 }
             }
-        } while (this.state == ParserState.WaitingForMagicByte && bytes.indexOf(this.start_marker, current_pos) > -1)
+        }
+
+        if (this.state == ParserState.WaitingForMagicByte) {
+            this.buffer = Buffer.from("");
+        }
 
         return messages;
     }

@@ -56,6 +56,13 @@ test('MessageStartTwoPass', () => {
     expect(mavlinkModule.parser.state).toBe(ParserState.WaitingForHeaderComplete);
 });
 
+test('MessageMultiple', () => {
+    let data_multi: Buffer = Buffer.from('fd1500006a0101fd000006466c6967687420706c616e2072656365697665646dcb' +
+        'fd0200006b01012f0000ffbe4bec', 'hex');
+
+    mavlinkModule.parse(Buffer.from(data_multi)).then(messages => {expect(messages.length).toBe(2)})
+});
+
 test('NoMessageStart', () => {
     mavlinkModule.parse(Buffer.from([0x02, 0x11, 0xFF, 0XFE]));
     // @ts-ignore

@@ -28,6 +28,7 @@ export abstract class MAVLinkParserBase {
     protected abstract start_marker: number;
     protected abstract minimum_packet_length: number;
     protected expected_packet_length: number = -1;
+    protected current_pos: number = 0;
     private message_factory_tuples: Array<[number, new (system_id: number, component_id: number) => MAVLinkMessage]> = new Array<[number, new (system_id: number, component_id: number) => MAVLinkMessage]>();
 
     private state: ParserState = ParserState.WaitingForMagicByte;
@@ -43,11 +44,12 @@ export abstract class MAVLinkParserBase {
         do { // allow parsing multiple messages from a single call
             if (this.state == ParserState.WaitingForMagicByte) {
                 // look for the defined magic byte
-                let message_start = bytes.indexOf(this.start_marker);
+                let message_start = bytes.indexOf(this.start_marker, this.current_pos);
                 if (message_start > -1) {
                     this.buffer = bytes.slice(message_start);
                     this.state = ParserState.WaitingForHeaderComplete;
                 }
+                this.current_pos = message_start;
             } else {
                 this.buffer = Buffer.concat([this.buffer, bytes]);
             }
@@ -73,6 +75,7 @@ export abstract class MAVLinkParserBase {
                         const message = this.parseMessage(this.buffer.slice(0, this.expected_packet_length));
                         if (message) {
                             messages.push(message);
+                            this.current_pos += this.expected_packet_length
                         }
                     } catch (e) {
                         throw e;
@@ -91,7 +94,7 @@ export abstract class MAVLinkParserBase {
     
                 }
             }
-        } while (this.state == ParserState.WaitingForMagicByte && bytes.indexOf(this.start_marker) > -1)
+        } while (this.state == ParserState.WaitingForMagicByte && bytes.indexOf(this.start_marker, this.current_pos) > -1)
 
         return messages;
     }
@@ -110,6 +113,6 @@ export abstract class MAVLinkParserBase {
             const constructorFn: (new (system_id: number, component_id: number) => MAVLinkMessage) = message_factory_tuple[1];
             return new constructorFn(system_id, component_id);
         }
-        throw new Error(`Unknown message ID.`);
+        throw new Error(`Unknown message ID. ` + message_id);
     }
 }

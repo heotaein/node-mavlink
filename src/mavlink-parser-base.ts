@@ -42,7 +42,7 @@ export abstract class MAVLinkParserBase {
 
         this.buffer = Buffer.concat([this.buffer, bytes]);
 
-        while (this.state == ParserState.WaitingForMagicByte && this.buffer.indexOf(this.start_marker) > -1) { // allow parsing multiple messages from a single call
+        while ((this.state == ParserState.WaitingForMagicByte && this.buffer.indexOf(this.start_marker) > -1) || this.state != ParserState.WaitingForMagicByte) { // allow parsing multiple messages from a single call
             if (this.state == ParserState.WaitingForMagicByte) {
                 // look for the defined magic byte
                 let message_start = this.buffer.indexOf(this.start_marker);
@@ -73,10 +73,10 @@ export abstract class MAVLinkParserBase {
                         const message = this.parseMessage(this.buffer.slice(0, this.expected_packet_length));
                         if (message) {
                             messages.push(message);
-                            this.buffer = this.buffer.slice(this.expected_packet_length);
                         }
+                        this.buffer = this.buffer.slice(this.expected_packet_length);
                     } catch (e) {
-                        //this.buffer = this.buffer.slice(1);
+                        this.buffer = this.buffer.slice(1);
                         throw e;
                     } finally {
                         // something was complete. Regardless of a complete message, drop the magic byte and restart.
@@ -84,6 +84,11 @@ export abstract class MAVLinkParserBase {
                         this.state = ParserState.WaitingForMagicByte;
                     }
                 }
+            }
+
+            // Checking if nothing more can be done
+            if (this.state == ParserState.WaitingForHeaderComplete || this.state == ParserState.WaitingForMessageComplete) {
+                break;
             }
         }
 

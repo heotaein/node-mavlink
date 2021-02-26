@@ -117,7 +117,12 @@ export class MAVLinkParserV2 extends MAVLinkParserBase {
             case "double":
                 return bytes.readDoubleLE(start);
             case "char":
-                return bytes.toString('ascii', start, 1);
+                let nullTerminator = bytes.indexOf(0x00, start)
+                if (nullTerminator == -1) {
+                    return bytes.toString('ascii', start);
+                } else {
+                    return bytes.toString('ascii', start, nullTerminator);
+                }
         }
     }
 }

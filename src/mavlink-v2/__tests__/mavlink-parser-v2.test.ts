@@ -23,9 +23,9 @@
 
 import {MAVLinkModule} from "../../mavlink-module";
 import {ParserState} from "../../parser-state.enum";
-import {messageRegistry} from "../../../assets/message-registry";
+import {messageRegistry} from "../../../api/message-registry";
 import {MAVLinkMessage} from "../../mavlink-message";
-import {MessageInterval} from "../../../assets/messages/message-interval";
+import {MessageInterval} from "../../../api/messages/message-interval";
 
 let mavlinkModule: MAVLinkModule;
 

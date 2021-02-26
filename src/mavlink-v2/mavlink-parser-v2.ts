@@ -81,25 +81,19 @@ export class MAVLinkParserV2 extends MAVLinkParserBase {
             let start = 0;
             for (const field of message._message_fields) {
                 const field_name: string = field[0];
-                let field_type = field[1];
+                const field_type: string = field[1];
                 const extension_field: boolean = field[2];
-
-                let str = field_type.split('[');
-                field_type = str[0];
-                let field_length = message.sizeof(field_type);
-                if (str.length === 2 && field_type == 'char') {
+                const field_length = message.sizeof(field_type);
+                const field_array_length = message.arrayLength(field_type)
+                if (field_array_length !== 0 && field_type.indexOf('char') !== -1) {
                     message[field_name] = this.read(payload, start, field_type);
-                    let mult = parseInt(str[1].slice(0, -1));
-                    start += Math.min(field_length * mult, message[field_name].length);
-                } else if (str.length === 2 && field_type != 'char') {
-                    let mult = parseInt(str[1].slice(0, -1));
-                    message[field_name] = new Array(mult)
-                    for (let i = 0;i < mult;i++) {
-                        if (start < len - 3) {
+                    start += Math.min(field_length * field_array_length, message[field_name].length);
+                } else if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
+                    message[field_name] = new Array(field_array_length)
+                    for (let i = 0;i < field_array_length;i++) {
+                        if (start < len - 2) {
                             message[field_name][i] = this.read(payload, start, field_type);
                             start += field_length;
-                        } else {
-                            message[field_name][i] = 0
                         }
                     }
                 }
@@ -117,6 +111,8 @@ export class MAVLinkParserV2 extends MAVLinkParserBase {
     }
 
     private read(bytes: Buffer, start: number, type: string): number | string | undefined {
+        type = MAVLinkMessage.stripArrayInfo(type);
+
         switch (type) {
             case "uint8_t":
                 return bytes.readUInt8(start);

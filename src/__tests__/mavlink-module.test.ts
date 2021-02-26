@@ -22,7 +22,7 @@
  */
 
 import {MAVLinkModule} from "../mavlink-module";
-import {messageRegistry} from "../../assets/message-registry";
+import {messageRegistry} from "../../api/message-registry";
 
 beforeAll(() => {
 });

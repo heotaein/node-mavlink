@@ -22,9 +22,9 @@
  */
 
 import {MAVLinkModule} from "../../mavlink-module";
-import {CommandLong} from "../../../assets/messages/command-long";
-import {MavCmd} from "../../../assets/enums/mav-cmd";
-import {messageRegistry} from "../../../assets/message-registry";
+import {CommandLong} from "../../../api/messages/command-long";
+import {MavCmd} from "../../../api/enums/mav-cmd";
+import {messageRegistry} from "../../../api/message-registry";
 
 let mavlinkModule: MAVLinkModule;
 

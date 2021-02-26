@@ -46,16 +46,13 @@ export class MAVLinkPackerV2 extends MAVLinkPackerBase {
         let start = 0;
         for (const field of message._message_fields) {
             const field_name: string = field[0];
-            let field_type: string = field[1];
+            const field_type: string = field[1];
             const extension_field: boolean = field[2];
-
-            let str = field_type.split('[');
-            field_type = str[0];
             const field_length = message.sizeof(field_type);
+            const field_array_length = message.arrayLength(field_type)
             if (!extension_field) {
-                if (str.length === 2 && str[0] !== 'char') {
-                    let mult = parseInt(str[1].slice(0, -1));
-                    for (let i = 0;i < mult && i < message[field_name].length;i++) {
+                if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
+                    for (let i = 0;i < field_array_length && i < message[field_name].length;i++) {
                         this.write(buffer, message[field_name][i], start + this.minimum_packet_length - 2, field_type);
                         start += field_length;
                     }
@@ -73,6 +70,8 @@ export class MAVLinkPackerV2 extends MAVLinkPackerBase {
     }
 
     private write(bytes: Buffer, message_field: any, start: number, type: string) {
+        type = MAVLinkMessage.stripArrayInfo(type);
+
         switch (type) {
             case "uint8_t":
                 return bytes.writeUInt8(message_field, start);

@@ -160,7 +160,20 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
 
     [key: string]: any;
 
+    public arrayLength(type: string): number {
+        let type_split = type.split('[');
+        if (type_split.length !== 2)
+            return 0
+        return parseInt(type_split[1].slice(0, -1));
+    }
+
+    static stripArrayInfo(type: string): string {
+        return type.split('[')[0];
+    }
+
     public sizeof(type: string): number {
+        type = MAVLinkMessage.stripArrayInfo(type);
+
         switch (type) {
             case "char":
             case "uint8_t":

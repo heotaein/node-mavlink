@@ -21,10 +21,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import {CommandLong} from "../../../assets/messages/command-long";
-import {MavCmd} from "../../../assets/enums/mav-cmd";
+import {CommandLong} from "../../../api/messages/command-long";
+import {MavCmd} from "../../../api/enums/mav-cmd";
 import {MAVLinkModule} from "../../mavlink-module";
-import {messageRegistry} from "../../../assets/message-registry";
+import {messageRegistry} from "../../../api/message-registry";
 
 let mavlinkModule: MAVLinkModule;
 

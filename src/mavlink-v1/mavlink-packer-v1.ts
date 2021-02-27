@@ -47,7 +47,7 @@ export class MAVLinkPackerV1 extends MAVLinkPackerBase {
             const field_type: string = field[1];
             const extension_field: boolean = field[2];
             const field_length = message.sizeof(field_type);
-            const field_array_length = message.arrayLength(field_type)
+            const field_array_length = field[3]
             if (!extension_field) {
                 if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
                     for (let i = 0;i < field_array_length && i < message[field_name].length;i++) {

@@ -116,7 +116,7 @@ export interface IMAVLinkMessage {
     _component_id: number;
     _message_id: number;
     _message_name: string;
-    _message_fields: [string, string, boolean][];
+    _message_fields: [string, string, boolean, number][];
     _payload_length: number;
     _crc_extra: number;
     _extension_length: number;
@@ -134,14 +134,14 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
 
     abstract _message_name: string;
     abstract _message_id: number;
-    abstract _message_fields: [string, string, boolean][];
+    abstract _message_fields: [string, string, boolean, number][];
     abstract _crc_extra: number;
 
     get _payload_length(): number {
         let length = 0;
         for (let field of this._message_fields.filter(field => true)) {
-            if (this.arrayLength(field[1]) !== 0)
-                length += this.arrayLength(field[1]) * this.sizeof(MAVLinkMessage.stripArrayInfo(field[1]))
+            if (field[3] !== 0)
+                length += field[3] * this.sizeof(field[1])
             else
                 length += this.sizeof(field[1]);
         }
@@ -158,20 +158,7 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
 
     [key: string]: any;
 
-    public arrayLength(type: string): number {
-        let type_split = type.split('[');
-        if (type_split.length !== 2)
-            return 0
-        return parseInt(type_split[1].slice(0, -1));
-    }
-
-    static stripArrayInfo(type: string): string {
-        return type.split('[')[0];
-    }
-
     public sizeof(type: string): number {
-        type = MAVLinkMessage.stripArrayInfo(type);
-
         switch (type) {
             case "char":
             case "uint8_t":
@@ -193,7 +180,6 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
             default:
                 return 0;
         }
-
     }
 
     public x25CRC(bytes: Buffer) {

@@ -152,7 +152,7 @@ test('MessageCharArrayParse', async () => {
         param_count: 1295,
         param_id: "MIS_TOTAL",
         param_index: 65535,
-        param_type: 73,
+        param_type: 4,
         param_value: 8
     });
 

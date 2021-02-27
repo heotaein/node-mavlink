@@ -73,7 +73,7 @@ export class MAVLinkParserV1 extends MAVLinkParserBase {
                 const field_type: string = field[1];
                 const extension_field: boolean = field[2];
                 const field_length = message.sizeof(field_type);
-                const field_array_length = message.arrayLength(field_type)
+                const field_array_length = field[3]
                 if (!extension_field) {
                     if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
                         message[field_name] = new Array(field_array_length)

@@ -139,13 +139,11 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
 
     get _payload_length(): number {
         let length = 0;
-        for (let field of this._message_fields.filter(field => !field[2])) {
-            let str = field[1].split('[');
-            let mult = 1;
-            if (str.length === 2) {
-                mult = parseInt(str[1].slice(0, -1));
-            }
-            length += mult * this.sizeof(str[0]);
+        for (let field of this._message_fields.filter(field => true)) {
+            if (this.arrayLength(field[1]) !== 0)
+                length += this.arrayLength(field[1]) * this.sizeof(MAVLinkMessage.stripArrayInfo(field[1]))
+            else
+                length += this.sizeof(field[1]);
         }
         return length;
     }

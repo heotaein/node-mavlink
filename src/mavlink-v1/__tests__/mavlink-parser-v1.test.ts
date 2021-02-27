@@ -23,7 +23,7 @@
 
 import {MAVLinkModule} from "../../mavlink-module";
 import {ParserState} from "../../parser-state.enum";
-import {messageRegistry} from "../../../api/message-registry";
+import {messageRegistry} from "../../../assets/message-registry";
 
 let mavlinkModule: MAVLinkModule;
 

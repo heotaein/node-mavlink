@@ -85,22 +85,20 @@ export class MAVLinkParserV2 extends MAVLinkParserBase {
                 const extension_field: boolean = field[2];
                 const field_length = message.sizeof(field_type);
                 const field_array_length = message.arrayLength(field_type)
-                if (field_array_length !== 0 && field_type.indexOf('char') !== -1) {
-                    message[field_name] = this.read(payload, start, field_type);
-                    start += Math.min(field_length * field_array_length, message[field_name].length);
-                } else if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
-                    message[field_name] = new Array(field_array_length)
-                    for (let i = 0;i < field_array_length;i++) {
-                        if (start < len - 2) {
-                            message[field_name][i] = this.read(payload, start, field_type);
+                if (!extension_field || (extension_field && start < payload.length)) {
+                    if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
+                        message[field_name] = new Array(field_array_length)
+                        for (let i = 0; i < field_array_length; i++) {
                             start += field_length;
+                            message[field_name][i] = this.read(payload, start, field_type);
                         }
+                    } else {
+                        message[field_name] = this.read(payload, start, field_type);
+                        if (field_array_length === 0)
+                            start += field_length;
+                        else
+                            start += field_length * field_array_length;
                     }
-                }
-                // ignore extension_field if at the end of the payload
-                else if (!(extension_field && start + field_length > payload.length)) {
-                    message[field_name] = this.read(payload, start, field_type);
-                    start += field_length;
                 }
             }
 

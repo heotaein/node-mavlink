@@ -33,9 +33,10 @@ export class MAVLinkPackerV2 extends MAVLinkPackerBase {
     }
 
     packMessage(message: MAVLinkMessage): Buffer {
-        const buffer = Buffer.alloc(this.minimum_packet_length + message._payload_length);
+        let message_payload_length = message._payload_length;
+        let buffer = Buffer.alloc(this.minimum_packet_length + message_payload_length);
         buffer.writeUInt8(this.start_marker, 0);
-        buffer.writeUInt8(message._payload_length, 1);
+        buffer.writeUInt8(message_payload_length, 1);
         buffer.writeUInt8(0, 2);
         buffer.writeUInt8(0, 3);
         buffer.writeUInt8(0, 4);
@@ -50,22 +51,33 @@ export class MAVLinkPackerV2 extends MAVLinkPackerBase {
             const extension_field: boolean = field[2];
             const field_length = message.sizeof(field_type);
             const field_array_length = message.arrayLength(field_type)
-            if (!extension_field) {
-                if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
-                    for (let i = 0;i < field_array_length && i < message[field_name].length;i++) {
-                        this.write(buffer, message[field_name][i], start + this.minimum_packet_length - 2, field_type);
-                        start += field_length;
-                    }
-                } else {
-                    this.write(buffer, message[field_name], start + this.minimum_packet_length - 2, field_type);
+
+            if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
+                for (let i = 0;i < field_array_length && i < message[field_name].length;i++) {
+                    this.write(buffer, message[field_name][i], start + this.minimum_packet_length - 2, field_type);
                     start += field_length;
                 }
+            } else {
+                this.write(buffer, message[field_name], start + this.minimum_packet_length - 2, field_type);
+                if (field_array_length === 0)
+                    start += field_length;
+                else
+                    start += field_length * field_array_length;
             }
         }
 
-        let actual = message.x25CRC(buffer.slice(1, this.minimum_packet_length + message._payload_length - 2));
+        // Truncate tailing zeros on payload
+        while (buffer.slice(this.minimum_packet_length + message_payload_length - 3, this.minimum_packet_length + message_payload_length - 2)[0] == 0) {
+            message_payload_length -= 1
+        }
 
-        buffer.writeUInt16LE(actual, this.minimum_packet_length + message._payload_length - 2);
+        buffer = buffer.slice(0, this.minimum_packet_length + message_payload_length)
+        buffer.writeUInt8(message_payload_length, 1);
+
+        // Add CRC
+        let actual = message.x25CRC(buffer.slice(1, this.minimum_packet_length + message_payload_length - 2));
+
+        buffer.writeUInt16LE(actual, this.minimum_packet_length + message_payload_length - 2);
         return buffer;
     }
 

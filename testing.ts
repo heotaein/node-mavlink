@@ -30,7 +30,8 @@ mavLink.on('message', function (message: MAVLinkMessage) {
 })
 
 // mavLink.parse(data_multi_ack_error)
-// mavLink.parse(data_data32)
+// @ts-ignore
+//console.log(mavLink.parse(data_data32))
 
 let data32_raw = Object.assign(new Data32(1, 1), {
     type: 129,
@@ -42,11 +43,10 @@ let data32_raw = Object.assign(new Data32(1, 1), {
         0,  25, 10, 34,   0
     ]
 })
+//let data32 = mavLink.pack([data32_raw])
 
-let data32 = mavLink.pack([data32_raw])
-
-console.log(data32_raw);
-console.log(data32)
+//console.log(data32_raw);
+//console.log(data32)
 
 let statustext_raw = Object.assign(new Statustext(1, 1), {
     severity: 3,
@@ -56,10 +56,10 @@ let statustext_raw = Object.assign(new Statustext(1, 1), {
 })
 
 
-
-// console.log(statustext_raw);
-
-//let statustext = mavLink.pack([statustext_raw])
+//
+//console.log(statustext_raw);
+//
+let statustext = mavLink.pack([statustext_raw])
 // @ts-ignore
-// console.log(statustext.toString('hex').match(/../g).join(' '));
-//mavLink.parse(statustext)
+console.log(statustext.toString('hex').match(/../g).join(' '));
+mavLink.parse(statustext)

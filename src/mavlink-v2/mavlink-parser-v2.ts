@@ -80,12 +80,28 @@ export class MAVLinkParserV2 extends MAVLinkParserBase {
 
             let start = 0;
             for (const field of message._message_fields) {
+                console.log(field)
                 const field_name: string = field[0];
                 const field_type: string = field[1];
                 const extension_field: boolean = field[2];
                 const field_length = message.sizeof(field_type);
-                message[field_name] = this.read(payload, start, field_type);
-                start += field_length;
+                const field_array_length = field[3]
+                if (!extension_field || (extension_field && start < payload.length)) {
+                    if (field_array_length !== 0 && field_type.indexOf('char') === -1) {
+                        message[field_name] = new Array(field_array_length).fill(0)
+                        for (let i = 0; i < field_array_length && start < payload.length; i++) {
+                            message[field_name][i] = this.read(payload, start, field_type);
+                            start += field_length;
+                        }
+                    } else {
+                        console.log(start, payload.length)
+                        message[field_name] = this.read(payload, start, field_type);
+                        if (field_array_length === 0)
+                            start += field_length;
+                        else
+                            start += field_length * field_array_length;
+                    }
+                }
             }
 
             return message;

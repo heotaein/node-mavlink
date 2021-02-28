@@ -116,7 +116,7 @@ export interface IMAVLinkMessage {
     _component_id: number;
     _message_id: number;
     _message_name: string;
-    _message_fields: [string, string, boolean][];
+    _message_fields: [string, string, boolean, number][];
     _payload_length: number;
     _crc_extra: number;
     _extension_length: number;
@@ -134,13 +134,16 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
 
     abstract _message_name: string;
     abstract _message_id: number;
-    abstract _message_fields: [string, string, boolean][];
+    abstract _message_fields: [string, string, boolean, number][];
     abstract _crc_extra: number;
 
     get _payload_length(): number {
         let length = 0;
-        for (let field of this._message_fields.filter(field => !field[2])) {
-            length += this.sizeof(field[1]);
+        for (let field of this._message_fields.filter(field => true)) {
+            if (field[3] !== 0)
+                length += field[3] * this.sizeof(field[1])
+            else
+                length += this.sizeof(field[1]);
         }
         return length;
     }
@@ -177,7 +180,6 @@ export abstract class MAVLinkMessage implements IMAVLinkMessage, IIndexable {
             default:
                 return 0;
         }
-
     }
 
     public x25CRC(bytes: Buffer) {

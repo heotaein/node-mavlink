@@ -26,6 +26,9 @@ import {ParserState} from "../../parser-state.enum";
 import {messageRegistry} from "../../../assets/message-registry";
 import {MAVLinkMessage} from "../../mavlink-message";
 import {MessageInterval} from "../../../assets/messages/message-interval";
+import {Data32} from "../../../assets/messages/data32";
+import {Statustext} from "../../../assets/messages/statustext";
+import {ParamValue} from "../../../assets/messages/param-value";
 
 let mavlinkModule: MAVLinkModule;
 
@@ -95,4 +98,76 @@ test('MessageTruncated', () => {
         // @ts-ignore
         expect(message[0].message_id).toBe(message_id);
     });
+});
+
+test('MessageArrayParse', async () => {
+    let message_data32_buffer: Buffer = Buffer.from('fd220000530163aa00008120fd130000530163004b000000000073b1ce' +
+        '2540a832066a2700001800190a2201af00', 'hex');
+
+    let message_data32 = Object.assign(new Data32(1, 99), {
+        type: 129,
+        len: 32,
+        data: [
+            253,  19,  0,  0,  83,   1,  99,   0, 75,
+            0,   0,  0,  0,   0, 115, 177, 206, 37,
+            64, 168, 50,  6, 106,  39,   0,   0, 24,
+            0,  25, 10, 34,   1
+        ]
+    });
+
+    expect((await mavlinkModule.parse(message_data32_buffer))[0]).toEqual(message_data32);
+});
+
+test('MessageArrayParseTruncated', async () => {
+    let message_data32_buffer: Buffer = Buffer.from('fd210000530163aa0000811ffd130000530163004b000000000073b1ce' +
+        '2540a832066a2700001800190a22d761', 'hex');
+
+    let message_data32 = Object.assign(new Data32(1, 99), {
+        type: 129,
+        len: 31,
+        data: [
+            253,  19,  0,  0,  83,   1,  99,   0, 75,
+            0,   0,  0,  0,   0, 115, 177, 206, 37,
+            64, 168, 50,  6, 106,  39,   0,   0, 24,
+            0,  25, 10, 34, 0
+        ]
+    });
+
+    expect((await mavlinkModule.parse(message_data32_buffer))[0]).toEqual(message_data32);
+});
+
+test('MessageCharArrayParse', async () => {
+    let message_statustext_buffer: Buffer = Buffer.from('fd1500003f0101fd000006466c6967687420706c616e20726563656976656486b0', 'hex');
+
+    let message_statustext = Object.assign(new Statustext(1, 1), {
+        severity: 6,
+        text: "Flight plan received"
+    });
+
+    expect((await mavlinkModule.parse(message_statustext_buffer))[0]).toEqual(message_statustext);
+
+    let message_param_val_buffer: Buffer = Buffer.from('fd190000410101160000000000410f05ffff4d49535f544f54414c000000000000000432ac', 'hex');
+
+    let message_param_val = Object.assign(new ParamValue(1, 1), {
+        param_count: 1295,
+        param_id: "MIS_TOTAL",
+        param_index: 65535,
+        param_type: 4,
+        param_value: 8
+    });
+
+    expect((await mavlinkModule.parse(message_param_val_buffer))[0]).toEqual(message_param_val);
+});
+
+test('MessageExtensionsParse', async () => {
+    let message_statustext_buffer: Buffer = Buffer.from('fd360000040101fd0000037465737400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010002d01b', 'hex');
+
+    let message_statustext = Object.assign(new Statustext(1, 1), {
+        severity: 3,
+        text: "test",
+        id: 1,
+        chunk_seq: 2
+    });
+
+    expect((await mavlinkModule.parse(message_statustext_buffer))[0]).toEqual(message_statustext);
 });

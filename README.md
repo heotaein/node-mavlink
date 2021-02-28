@@ -1,31 +1,46 @@
 [![Build Status](https://travis-ci.org/ifrunistuttgart/node-mavlink.svg?branch=master)](https://travis-ci.org/ifrunistuttgart/node-mavlink)
 [![Coverage Status](https://coveralls.io/repos/github/ifrunistuttgart/node-mavlink/badge.svg?branch=master)](https://coveralls.io/github/ifrunistuttgart/node-mavlink?branch=master)
 # node-mavlink
-node-mavlink is a library for parsing and packing MAVLink 2 messages using TypeScript or, when transpiled, using JavaScript in NodeJS. This project is an typed alternative for [node-mavlink](https://github.com/omcaree/node-mavlink) with the additional support of MAVLink2.
+node-mavlink is a library for parsing and packing MAVLink 2 messages using TypeScript or, when transpiled, using JavaScript in NodeJS. This project is an typed alternative for [node-mavlink](https://github.com/omcaree/node-mavlink) with the additional support of MAVLink2, char strings and arrays.
 ### Limitations
 At this point, not supported are:
 * message signing
-* arrays
 
 ## Installation
 The module is published on npm. Install using:
-
-    npm install @ifrunistuttgart/node-mavlink --save
-
+```bash
+npm install @gardsteinsvik/node-mavlink --save
+```
 ## Usage
-To be able to use this module, the MAVLink message definitions need to be parsed using the official [pymavlink](https://github.com/ArduPilot/pymavlink), which creates the TypeScript classes.
+### Generating dialect files
+To be able to use this module, the MAVLink message definitions need to be parsed using a modified [pymavlink](https://github.com/trygve55/pymavlink), which creates the TypeScript classes.
 Using the command-line interface, the classes can be generated using
-
-    python tools/mavgen.py -o ./assets --lang TypeScript --wire-protocol 2.0 <message_definition.xml>
+```bash
+git clone https://github.com/trygve55/pymavlink
+cd pymavlink
+python3 -m venv .   # Optional, sets up a virtual environment. 
+source bin/activate # Optional
+pip install future
+wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/minimal.xml
+wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/common.xml
+wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/ardupilotmega.xml # Only run if you need the ardupilotmega dialect.  
+wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/uAvionix.xml      # Only run if you need the ardupilotmega dialect.
+wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/icarous.xml       # Only run if you need the ardupilotmega dialect.
+mkdir ./assets
+python tools/mavgen.py -o ./assets --lang TypeScript --wire-protocol 2.0 <message_definition.xml>
+```
 which will produce all needed TypeScript files in a folder called *assets*. Instead of *<message_definition.xml>* you will probably use *common.xml*.
 Together with the all messages (*classes* directory) and enums (*enums* directory), a file *messageRegistry.ts* is created, which provides an array holding all message IDs and the respective constructor.
 
+### Pure JavaScript
 If you want to use the library with pure JavaScript, you need to transpile the generated files. You can install the transpiler with:
-
-    npm i typescript --save-dev
+```bash
+npm i typescript --save-dev
+```
 Then run within the *assets* directory
-
-    tsc
+```bash
+tsc
+```
  to start the process.
 
 ## Examples

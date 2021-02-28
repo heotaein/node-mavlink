@@ -20,7 +20,7 @@ jobs:
       - run: git clone https://github.com/trygve55/pymavlink.git
       - run: mkdir assets
       - run: pip install future
-      - run: python pymavlink/tools/mavgen.py -o ./assets --lang TypeScript --wire-protocol 2.0 common.xml
+      - run: python pymavlink/tools/mavgen.py -o ./assets --lang TypeScript --wire-protocol 2.0 ardupilotmega.xml
       - run: npm ci
       - run: npm run build
       - run: cp -r lib node_modules/node-mavlink

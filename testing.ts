@@ -1,8 +1,8 @@
 import {MAVLinkMessage, MAVLinkModule} from "./src";
 
-import {messageRegistry} from "./api/message-registry";
-import {Data32} from "./api/messages/data32";
-import {Statustext} from "./api/messages/statustext";
+import {messageRegistry} from "./assets/message-registry";
+import {Data32} from "./assets/messages/data32";
+import {Statustext} from "./assets/messages/statustext";
 
 const mavLink = new MAVLinkModule(messageRegistry)
 mavLink.upgradeLink()

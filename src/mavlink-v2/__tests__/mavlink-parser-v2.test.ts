@@ -100,7 +100,7 @@ test('MessageTruncated', () => {
     });
 });
 
-test.skip('MessageArrayParse', async () => {
+test('MessageArrayParse', async () => {
     let message_data32_buffer: Buffer = Buffer.from('fd220000530163aa00008120fd130000530163004b000000000073b1ce' +
         '2540a832066a2700001800190a2201af00', 'hex');
 
@@ -118,7 +118,7 @@ test.skip('MessageArrayParse', async () => {
     expect((await mavlinkModule.parse(message_data32_buffer))[0]).toEqual(message_data32);
 });
 
-test.skip('MessageArrayParseTruncated', async () => {
+test('MessageArrayParseTruncated', async () => {
     let message_data32_buffer: Buffer = Buffer.from('fd210000530163aa0000811ffd130000530163004b000000000073b1ce' +
         '2540a832066a2700001800190a22d761', 'hex');
 

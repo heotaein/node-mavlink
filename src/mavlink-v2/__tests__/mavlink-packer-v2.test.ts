@@ -63,7 +63,7 @@ test('MessageCharArrayPack', async () => {
     expect((mavlinkModule.pack([message_statustext]))).toEqual(message_statustext_buffer);
 });
 
-test.skip('MessageArrayPack', async () => {
+test('MessageArrayPack', async () => {
     let message_data32_buffer: Buffer = Buffer.from('fd220000000163aa00008120fd130000530163004b000000000073b1ce' +
         '2540a832066a2700001800190a2201a889', 'hex');
 

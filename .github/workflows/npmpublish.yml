@@ -14,7 +14,7 @@ jobs:
           node-version: 12
       - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/common.xml
       - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/minimal.xml
-      - run: git clone https://github.com/ArduPilot/pymavlink.git
+      - run: git clone https://github.com/trygve55/pymavlink.git
       - run: mkdir assets
       - run: pip install future
       - run: python pymavlink/tools/mavgen.py -o ./assets --lang TypeScript --wire-protocol 2.0 common.xml

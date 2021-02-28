@@ -14,6 +14,9 @@ jobs:
           node-version: 12
       - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/common.xml
       - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/minimal.xml
+      - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/ardupilotmega.xml
+      - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/uAvionix.xml
+      - run: wget https://raw.githubusercontent.com/mavlink/mavlink/master/message_definitions/v1.0/icarous.xml
       - run: git clone https://github.com/trygve55/pymavlink.git
       - run: mkdir assets
       - run: pip install future

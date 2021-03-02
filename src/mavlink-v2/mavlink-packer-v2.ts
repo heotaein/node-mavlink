@@ -67,7 +67,7 @@ export class MAVLinkPackerV2 extends MAVLinkPackerBase {
         }
 
         // Truncate tailing zeros on payload
-        while (buffer.slice(this.minimum_packet_length + message_payload_length - 3, this.minimum_packet_length + message_payload_length - 2)[0] == 0) {
+        while (buffer.slice(this.minimum_packet_length + message_payload_length - 3, this.minimum_packet_length + message_payload_length - 2)[0] == 0 && message_payload_length !== 0) {
             message_payload_length -= 1
         }
 

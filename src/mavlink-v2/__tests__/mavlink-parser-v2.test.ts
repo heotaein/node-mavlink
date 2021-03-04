@@ -29,6 +29,7 @@ import {MessageInterval} from "../../../assets/messages/message-interval";
 import {Data32} from "../../../assets/messages/data32";
 import {Statustext} from "../../../assets/messages/statustext";
 import {ParamValue} from "../../../assets/messages/param-value";
+import {HomePosition} from "../../../assets/messages/home-position";
 
 let mavlinkModule: MAVLinkModule;
 
@@ -141,7 +142,9 @@ test('MessageCharArrayParse', async () => {
 
     let message_statustext = Object.assign(new Statustext(1, 1), {
         severity: 6,
-        text: "Flight plan received"
+        text: "Flight plan received",
+        id: 0,
+        chunk_seq: 0
     });
 
     expect((await mavlinkModule.parse(message_statustext_buffer))[0]).toEqual(message_statustext);
@@ -170,4 +173,24 @@ test('MessageExtensionsParse', async () => {
     });
 
     expect((await mavlinkModule.parse(message_statustext_buffer))[0]).toEqual(message_statustext);
+});
+
+test('MessageExtensionsParse', async () => {
+    let message_homeposition_buffer: Buffer = Buffer.from('fd380000140101f200004bbace259b2a32066a2700000000000000000000000000000000803f00000000000000000000000000000000000000000000000041b0a3049996', 'hex');
+
+    let message_homeposition = Object.assign(new HomePosition(1, 1), {
+        latitude: 634305099,
+        longitude: 103951003,
+        altitude: 10090,
+        x: 0,
+        y: 0,
+        z: 0,
+        q: [1, 0, 0, 0],
+        approach_x: 0,
+        approach_y: 0,
+        approach_z: 0,
+        time_usec: 77836353
+    });
+
+    expect((await mavlinkModule.parse(message_homeposition_buffer))[0]).toEqual(message_homeposition);
 });

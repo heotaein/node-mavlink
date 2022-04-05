@@ -76,7 +76,7 @@ export abstract class MAVLinkParserBase {
                         }
                         this.buffer = this.buffer.slice(this.expected_packet_length);
                     } catch (e) {
-                        this.buffer = this.buffer.slice(1);
+                        this.buffer = Buffer.from("");
                         throw e;
                     } finally {
                         // something was complete. Regardless of a complete message, drop the magic byte and restart.

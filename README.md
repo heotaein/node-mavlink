@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/ifrunistuttgart/node-mavlink.svg?branch=master)](https://travis-ci.org/ifrunistuttgart/node-mavlink)
 [![Coverage Status](https://coveralls.io/repos/github/ifrunistuttgart/node-mavlink/badge.svg?branch=master)](https://coveralls.io/github/ifrunistuttgart/node-mavlink?branch=master)
+# heotaein Fork Version
+
 # node-mavlink
 node-mavlink is a library for parsing and packing MAVLink 2 messages using TypeScript or, when transpiled, using JavaScript in NodeJS. This project is an typed alternative for [node-mavlink](https://github.com/omcaree/node-mavlink) with the additional support of MAVLink2, char strings and arrays.
 ### Limitations
@@ -9,7 +11,7 @@ At this point, not supported are:
 ## Installation
 The module is published on npm. Install using:
 ```bash
-npm install @gardsteinsvik/node-mavlink --save
+npm install @heotaein/node-mavlink --save
 ```
 ## Usage
 ### Generating dialect files
@@ -47,7 +49,7 @@ tsc
 ### TypeScript
 
 ```ts
-import {MAVLinkModule, MAVLinkMessage} from '@ifrunistuttgart/node-mavlink';  
+import {MAVLinkModule, MAVLinkMessage} from '@heotaein/node-mavlink';  
 import {messageRegistry} from './assets/message-registry';  
   
 import Serialport from 'serialport';  
